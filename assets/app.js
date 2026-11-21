@@ -1,0 +1,17 @@
+const products=[
+{id:'glow-serum',name:'Luminous Glow Serum',category:'Skincare',price:38,image:'https://images.unsplash.com/photo-1620916566398-39f1143ab7be?auto=format&fit=crop&w=700&q=85'},
+{id:'lip-tint',name:'Velvet Lip Tint',category:'Makeup',price:24,image:'https://images.unsplash.com/photo-1586495777744-4413f21062fa?auto=format&fit=crop&w=700&q=85'},
+{id:'cream',name:'Cloud Barrier Cream',category:'Skincare',price:42,image:'https://images.unsplash.com/photo-1608248597279-f99d160bfcbc?auto=format&fit=crop&w=700&q=85'},
+{id:'set',name:'Radiance Ritual Set',category:'Sets',price:68,image:'https://images.unsplash.com/photo-1556228578-8c89e6adf883?auto=format&fit=crop&w=700&q=85'}];
+function cart(){try{return JSON.parse(localStorage.getItem('veloraCart')||'[]')}catch(e){return[]}}function saveCart(v){localStorage.setItem('veloraCart',JSON.stringify(v));updateCount()}
+function updateCount(){const el=document.getElementById('cartCount');if(el)el.textContent=cart().reduce((n,i)=>n+i.qty,0)}
+function card(p){return `<article class="product-card"><img src="${p.image}" alt="${p.name}"><h3>${p.name}</h3><p>$${p.price}.00</p><button onclick="addToCart('${p.id}')">Add to bag</button></article>`}
+function addToCart(id){const c=cart(),item=c.find(i=>i.id===id);item?item.qty++:c.push({id,qty:1});saveCart(c);alert('Added to your bag')}
+window.addToCart=addToCart;
+updateCount();
+const featured=document.getElementById('featured'),shop=document.getElementById('shopGrid');if(featured)featured.innerHTML=products.map(card).join('');if(shop)shop.innerHTML=products.map(card).join('');
+const search=document.getElementById('searchInput'),results=document.getElementById('searchResults');if(search&&results){const render=()=>results.innerHTML=products.filter(p=>(p.name+' '+p.category).toLowerCase().includes(search.value.toLowerCase())).map(card).join('')||'<p>No products found.</p>';search.addEventListener('input',render);render()}
+function renderCart(){const box=document.getElementById('cartItems');if(!box)return;const c=cart();if(!c.length){box.innerHTML='<p>Your bag is empty.</p>';document.getElementById('cartTotal').textContent='$0.00';return}let total=0;box.innerHTML=c.map(i=>{const p=products.find(x=>x.id===i.id);total+=p.price*i.qty;return `<div class="cart-row"><img src="${p.image}" alt="${p.name}"><div><strong>${p.name}</strong><p>Quantity: ${i.qty}</p></div><strong>$${p.price*i.qty}.00</strong><button onclick="removeItem('${p.id}')">Remove</button></div>`}).join('');document.getElementById('cartTotal').textContent='$'+total+'.00'}
+function removeItem(id){saveCart(cart().filter(i=>i.id!==id));renderCart()}window.removeItem=removeItem;renderCart();
+['signinForm','signupForm','contactForm','checkoutForm'].forEach(id=>{const f=document.getElementById(id);if(f)f.addEventListener('submit',e=>{e.preventDefault();alert(id==='contactForm'?'Thanks! We’ll get back to you soon.':id==='checkoutForm'?'Order placed successfully!':'Welcome to Velora!');if(id==='checkoutForm'||id==='signinForm'||id==='signupForm')location.href=id==='checkoutForm'?'index.html':'index.html'})});
+const checkout=document.getElementById('checkoutBtn');if(checkout)checkout.addEventListener('click',()=>location.href='checkout.html');
